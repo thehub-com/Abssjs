@@ -1,7 +1,6 @@
-// 🔗 BACKEND
 const API_URL = "https://absai-hd6q.onrender.com/api/chat";
 
-// 🔥 FIREBASE
+/* ---------- FIREBASE ---------- */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getAuth,
@@ -19,44 +18,59 @@ const firebaseConfig = {
   appId: "1:333050406333:web:51bb5db3c08a75e0e8ded4"
 };
 
-const appFB = initializeApp(firebaseConfig);
-const auth = getAuth(appFB);
+const fb = initializeApp(firebaseConfig);
+const auth = getAuth(fb);
 
-// UI
+/* ---------- UI ---------- */
 const authBox = document.getElementById("auth");
 const appBox = document.getElementById("app");
 const chat = document.getElementById("chat");
+const input = document.getElementById("prompt");
 
-onAuthStateChanged(auth, user => {
-  if (user) {
+/* ---------- STORAGE ---------- */
+let messages = JSON.parse(localStorage.getItem("abs_chat") || "[]");
+messages.forEach(m => addMsg(m.text, m.role));
+
+function save() {
+  localStorage.setItem("abs_chat", JSON.stringify(messages));
+}
+
+/* ---------- AUTH ---------- */
+onAuthStateChanged(auth, u => {
+  if (u) {
     authBox.classList.add("hidden");
     appBox.classList.remove("hidden");
   }
 });
 
-// AUTH
-document.getElementById("login").onclick = () =>
+login.onclick = () =>
   signInWithEmailAndPassword(auth, email.value, password.value);
 
-document.getElementById("register").onclick = () =>
+register.onclick = () =>
   createUserWithEmailAndPassword(auth, email.value, password.value);
 
-document.getElementById("google").onclick = () =>
+google.onclick = () =>
   signInWithPopup(auth, new GoogleAuthProvider());
 
-// CHAT
-document.getElementById("send").onclick = send;
-document.getElementById("prompt").addEventListener("keydown", e => {
-  if (e.key === "Enter") send();
-});
+/* ---------- CHAT ---------- */
+send.onclick = send;
+input.onkeydown = e => e.key === "Enter" && send();
+newChat.onclick = () => {
+  messages = [];
+  chat.innerHTML = "";
+  save();
+};
 
 async function send() {
-  const input = document.getElementById("prompt");
   const text = input.value.trim();
   if (!text) return;
 
   addMsg(text, "user");
+  messages.push({ role: "user", text });
+  save();
   input.value = "";
+
+  const botDiv = addMsg("", "bot");
 
   const res = await fetch(API_URL, {
     method: "POST",
@@ -65,13 +79,26 @@ async function send() {
   });
 
   const data = await res.json();
-  addMsg(data.answer || "Ошибка", "bot");
+
+  // ПСЕВДО-СТРИМИНГ
+  let i = 0;
+  const txt = data.answer || "Ошибка";
+  const timer = setInterval(() => {
+    botDiv.textContent += txt[i++];
+    chat.scrollTop = chat.scrollHeight;
+    if (i >= txt.length) {
+      clearInterval(timer);
+      messages.push({ role: "bot", text: txt });
+      save();
+    }
+  }, 15);
 }
 
-function addMsg(text, cls) {
-  const div = document.createElement("div");
-  div.className = `msg ${cls}`;
-  div.textContent = text;
-  chat.appendChild(div);
+function addMsg(text, role) {
+  const d = document.createElement("div");
+  d.className = `msg ${role}`;
+  d.textContent = text;
+  chat.appendChild(d);
   chat.scrollTop = chat.scrollHeight;
+  return d;
 }
