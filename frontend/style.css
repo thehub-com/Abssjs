@@ -1,0 +1,96 @@
+:root {
+  --orange: #ff9800;
+  --black: #0b0b0b;
+  --white: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: var(--black);
+  color: var(--white);
+  height: 100vh;
+}
+
+/* AUTH */
+#auth {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 40px;
+}
+
+#auth input, #auth button {
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+}
+
+#auth button {
+  background: var(--orange);
+  color: black;
+  font-weight: bold;
+}
+
+/* APP */
+.hidden { display: none; }
+
+header {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  border-bottom: 1px solid #222;
+}
+
+#chat {
+  padding: 16px;
+  height: calc(100vh - 120px);
+  overflow-y: auto;
+}
+
+.msg {
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  max-width: 85%;
+}
+
+.user {
+  background: var(--orange);
+  color: black;
+  margin-left: auto;
+}
+
+.bot {
+  background: #1a1a1a;
+  border: 1px solid var(--orange);
+}
+
+.input {
+  display: flex;
+  padding: 10px;
+  gap: 10px;
+  border-top: 1px solid #222;
+}
+
+.input input {
+  flex: 1;
+  padding: 12px;
+  border-radius: 20px;
+  border: none;
+}
+
+.input button {
+  background: var(--orange);
+  border: none;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  font-size: 18px;
+}
