@@ -2,13 +2,13 @@
   "name": "abs-ai-backend",
   "version": "1.0.0",
   "type": "module",
-  "main": "server.js",
+  "main": "server.mjs",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.mjs"
   },
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^4.18.2",
+    "express": "^4.19.2",
     "node-fetch": "^3.3.2"
   }
 }
