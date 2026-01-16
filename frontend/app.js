@@ -1,104 +1,91 @@
-const API_URL = "https://absai-hd6q.onrender.com/api/chat";
+// ===== BACKEND =====
+const BACKEND_URL = "https://absai-hd6q.onrender.com";
 
-/* ---------- FIREBASE ---------- */
+// ===== FIREBASE =====
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getAuth,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  GoogleAuthProvider,
   signInWithPopup,
+  GoogleAuthProvider,
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDq3tDQnBFXrKW-66JxFPaWG3uso_3XXYY",
-  authDomain: "abs-ai-ec395.firebaseapp.com",
-  projectId: "abs-ai-ec395",
-  appId: "1:333050406333:web:51bb5db3c08a75e0e8ded4"
+  apiKey: "FIREBASE_API_KEY",
+  authDomain: "PROJECT.firebaseapp.com",
+  projectId: "PROJECT_ID",
 };
 
-const fb = initializeApp(firebaseConfig);
-const auth = getAuth(fb);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
 
-/* ---------- UI ---------- */
-const authBox = document.getElementById("auth");
-const appBox = document.getElementById("app");
+// ===== UI =====
 const chat = document.getElementById("chat");
-const input = document.getElementById("prompt");
+const input = document.getElementById("input");
+const sendBtn = document.getElementById("send");
 
-/* ---------- STORAGE ---------- */
-let messages = JSON.parse(localStorage.getItem("abs_chat") || "[]");
-messages.forEach(m => addMsg(m.text, m.role));
+let messages = [
+  { role: "system", text: "Ты ассистент ABS AI." }
+];
 
-function save() {
-  localStorage.setItem("abs_chat", JSON.stringify(messages));
-}
+// ===== AUTH =====
+window.login = async () => {
+  await signInWithEmailAndPassword(
+    auth,
+    email.value,
+    password.value
+  );
+};
 
-/* ---------- AUTH ---------- */
-onAuthStateChanged(auth, u => {
-  if (u) {
-    authBox.classList.add("hidden");
-    appBox.classList.remove("hidden");
+window.register = async () => {
+  await createUserWithEmailAndPassword(
+    auth,
+    email.value,
+    password.value
+  );
+};
+
+window.google = async () => {
+  await signInWithPopup(auth, provider);
+};
+
+onAuthStateChanged(auth, user => {
+  if (user) {
+    document.getElementById("auth").style.display = "none";
+    document.getElementById("chatbox").style.display = "block";
   }
 });
 
-login.onclick = () =>
-  signInWithEmailAndPassword(auth, email.value, password.value);
-
-register.onclick = () =>
-  createUserWithEmailAndPassword(auth, email.value, password.value);
-
-google.onclick = () =>
-  signInWithPopup(auth, new GoogleAuthProvider());
-
-/* ---------- CHAT ---------- */
-send.onclick = send;
-input.onkeydown = e => e.key === "Enter" && send();
-newChat.onclick = () => {
-  messages = [];
-  chat.innerHTML = "";
-  save();
-};
-
-async function send() {
+// ===== CHAT =====
+sendBtn.onclick = async () => {
   const text = input.value.trim();
   if (!text) return;
 
-  addMsg(text, "user");
-  messages.push({ role: "user", text });
-  save();
+  addMessage("Ты", text);
   input.value = "";
 
-  const botDiv = addMsg("", "bot");
+  messages.push({ role: "user", text });
 
-  const res = await fetch(API_URL, {
+  const res = await fetch(`${BACKEND_URL}/api/chat`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ prompt: text })
+    body: JSON.stringify({ messages })
   });
 
   const data = await res.json();
+  addMessage("ABS AI", data.reply);
 
-  // ПСЕВДО-СТРИМИНГ
-  let i = 0;
-  const txt = data.answer || "Ошибка";
-  const timer = setInterval(() => {
-    botDiv.textContent += txt[i++];
-    chat.scrollTop = chat.scrollHeight;
-    if (i >= txt.length) {
-      clearInterval(timer);
-      messages.push({ role: "bot", text: txt });
-      save();
-    }
-  }, 15);
-}
+  messages.push({ role: "assistant", text: data.reply });
+};
 
-function addMsg(text, role) {
-  const d = document.createElement("div");
-  d.className = `msg ${role}`;
-  d.textContent = text;
-  chat.appendChild(d);
+// ===== UI HELPERS =====
+function addMessage(author, text) {
+  const div = document.createElement("div");
+  div.className = author === "Ты" ? "me" : "bot";
+  div.innerHTML = `<b>${author}:</b> ${text}`;
+  chat.appendChild(div);
   chat.scrollTop = chat.scrollHeight;
-  return d;
 }
