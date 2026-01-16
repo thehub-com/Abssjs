@@ -1,38 +1,38 @@
 :root {
   --orange: #ff9800;
-  --black: #0b0b0b;
-  --white: #ffffff;
+  --bg: #0a0a0a;
+  --panel: #151515;
+  --white: #fff;
 }
 
-* {
-  box-sizing: border-box;
-  font-family: Arial, sans-serif;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
-  background: var(--black);
+  background: var(--bg);
   color: var(--white);
   height: 100vh;
+  font-family: system-ui, sans-serif;
 }
 
 /* AUTH */
 #auth {
+  padding: 40px;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 40px;
 }
-
+#auth h1 {
+  color: var(--orange);
+  text-align: center;
+}
 #auth input, #auth button {
-  padding: 12px;
-  border-radius: 10px;
+  padding: 14px;
+  border-radius: 12px;
   border: none;
 }
-
 #auth button {
   background: var(--orange);
-  color: black;
   font-weight: bold;
 }
 
@@ -45,7 +45,13 @@ header {
   align-items: center;
   justify-content: space-between;
   padding: 0 16px;
-  border-bottom: 1px solid #222;
+  background: var(--panel);
+  box-shadow: 0 0 10px #000;
+}
+
+.title {
+  color: var(--orange);
+  font-weight: bold;
 }
 
 #chat {
@@ -55,42 +61,48 @@ header {
 }
 
 .msg {
+  padding: 12px 16px;
+  border-radius: 16px;
   margin-bottom: 12px;
-  padding: 10px 14px;
-  border-radius: 12px;
   max-width: 85%;
+  animation: fade .2s ease;
 }
 
 .user {
   background: var(--orange);
-  color: black;
+  color: #000;
   margin-left: auto;
 }
 
 .bot {
-  background: #1a1a1a;
+  background: var(--panel);
   border: 1px solid var(--orange);
+  box-shadow: 0 0 10px rgba(255,152,0,.2);
 }
 
 .input {
   display: flex;
-  padding: 10px;
   gap: 10px;
-  border-top: 1px solid #222;
+  padding: 10px;
+  background: var(--panel);
 }
 
 .input input {
   flex: 1;
-  padding: 12px;
-  border-radius: 20px;
+  padding: 14px;
+  border-radius: 24px;
   border: none;
 }
 
 .input button {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
   background: var(--orange);
   border: none;
-  border-radius: 50%;
-  width: 44px;
-  height: 44px;
-  font-size: 18px;
+}
+
+@keyframes fade {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; }
 }
